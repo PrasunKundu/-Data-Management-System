@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>AI Data Management System</h1>
+                <div class="status-indicators">
+                    <div class="status status--success" id="validation-status">
+                        <span>✓ Validation Active</span>
+                    </div>
+                    <div class="status status--info" id="data-status">
+                        <span>3 Files Loaded</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-main">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar">
+                <div class="nav-menu">
+                    <button class="nav-item active" data-section="upload">
+                        <span>📁 Upload</span>
+                    </button>
+                    <button class="nav-item" data-section="data-grid">
+                        <span>📊 Data Grid</span>
+                    </button>
+                    <button class="nav-item" data-section="validation">
+                        <span>✅ Validation</span>
+                    </button>
+                    <button class="nav-item" data-section="rules">
+                        <span>⚙️ Business Rules</span>
+                    </button>
+                    <button class="nav-item" data-section="priorities">
+                        <span>⚖️ Priorities</span>
+                    </button>
+                    <button class="nav-item" data-section="export">
+                        <span>📤 Export</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="content">
+                <!-- Upload Section -->
+                <section id="upload-section" class="section active">
+                    <div class="section-header">
+                        <h2>File Upload</h2>
+                        <p>Upload CSV or XLSX files for clients, workers, and tasks data</p>
+                    </div>
+                    
+                    <div class="upload-area">
+                        <div class="upload-zones">
+                            <div class="upload-zone" data-type="clients">
+                                <div class="upload-content">
+                                    <div class="upload-icon">📁</div>
+                                    <h3>Clients Data</h3>
+                                    <p>Drop CSV/XLSX file here or click to browse</p>
+                                    <input type="file" id="clients-file" accept=".csv,.xlsx,.xls" hidden>
+                                    <button class="btn btn--outline" onclick="document.getElementById('clients-file').click()">Browse Files</button>
+                                </div>
+                                <div class="upload-status" id="clients-status"></div>
+                            </div>
+                            
+                            <div class="upload-zone" data-type="workers">
+                                <div class="upload-content">
+                                    <div class="upload-icon">👥</div>
+                                    <h3>Workers Data</h3>
+                                    <p>Drop CSV/XLSX file here or click to browse</p>
+                                    <input type="file" id="workers-file" accept=".csv,.xlsx,.xls" hidden>
+                                    <button class="btn btn--outline" onclick="document.getElementById('workers-file').click()">Browse Files</button>
+                                </div>
+                                <div class="upload-status" id="workers-status"></div>
+                            </div>
+                            
+                            <div class="upload-zone" data-type="tasks">
+                                <div class="upload-content">
+                                    <div class="upload-icon">📋</div>
+                                    <h3>Tasks Data</h3>
+                                    <p>Drop CSV/XLSX file here or click to browse</p>
+                                    <input type="file" id="tasks-file" accept=".csv,.xlsx,.xls" hidden>
+                                    <button class="btn btn--outline" onclick="document.getElementById('tasks-file').click()">Browse Files</button>
+                                </div>
+                                <div class="upload-status" id="tasks-status"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-actions">
+                            <button class="btn btn--primary" id="load-sample-data">Load Sample Data</button>
+                            <button class="btn btn--secondary" id="clear-all-data">Clear All Data</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Grid Section -->
+                <section id="data-grid-section" class="section">
+                    <div class="section-header">
+                        <h2>Data Grid</h2>
+                        <p>Edit your data in an interactive grid</p>
+                    </div>
+                    
+                    <div class="data-grid-container">
+                        <div class="grid-tabs">
+                            <button class="grid-tab active" data-grid="clients">Clients (3)</button>
+                            <button class="grid-tab" data-grid="workers">Workers (3)</button>
+                            <button class="grid-tab" data-grid="tasks">Tasks (3)</button>
+                        </div>
+                        
+                        <div class="grid-actions">
+                            <button class="btn btn--sm btn--primary" id="add-row">+ Add Row</button>
+                            <button class="btn btn--sm btn--secondary" id="delete-selected">Delete Selected</button>
+                            <button class="btn btn--sm btn--outline" id="save-changes">Save Changes</button>
+                        </div>
+                        
+                        <div class="grid-content">
+                            <div id="clients-grid" class="data-grid active"></div>
+                            <div id="workers-grid" class="data-grid"></div>
+                            <div id="tasks-grid" class="data-grid"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Validation Section -->
+                <section id="validation-section" class="section">
+                    <div class="section-header">
+                        <h2>AI Validation</h2>
+                        <p>Real-time data validation and error detection</p>
+                    </div>
+                    
+                    <div class="validation-container">
+                        <div class="validation-summary">
+                            <div class="validation-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number" id="total-records">9</div>
+                                    <div class="stat-label">Total Records</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number error" id="error-count">0</div>
+                                    <div class="stat-label">Errors</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number warning" id="warning-count">0</div>
+                                    <div class="stat-label">Warnings</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number success" id="valid-count">9</div>
+                                    <div class="stat-label">Valid</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-settings">
+                            <h3>Validation Settings</h3>
+                            <div class="setting-group">
+                                <label class="form-label">
+                                    <input type="checkbox" id="email-validation" checked> Email Format Validation
+                                </label>
+                                <label class="form-label">
+                                    <input type="checkbox" id="phone-validation" checked> Phone Format Validation
+                                </label>
+                                <label class="form-label">
+                                    <input type="checkbox" id="date-validation" checked> Date Format Validation
+                                </label>
+                                <label class="form-label">
+                                    <input type="checkbox" id="duplicate-validation" checked> Duplicate Detection
+                                </label>
+                                <label class="form-label">
+                                    <input type="checkbox" id="required-validation" checked> Required Fields
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-results" id="validation-results">
+                            <h3>Validation Results</h3>
+                            <div class="results-list">
+                                <div class="result-item success">
+                                    <span class="result-icon">✓</span>
+                                    <span>All data validation checks passed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Business Rules Section -->
+                <section id="rules-section" class="section">
+                    <div class="section-header">
+                        <h2>Business Rules</h2>
+                        <p>Create and manage business rules for your data</p>
+                    </div>
+                    
+                    <div class="rules-container">
+                        <div class="rules-header">
+                            <button class="btn btn--primary" id="add-rule">+ Add New Rule</button>
+                            <button class="btn btn--secondary" id="load-templates">Load Templates</button>
+                        </div>
+                        
+                        <div class="rules-list" id="rules-list">
+                            <!-- Rules will be populated here -->
+                        </div>
+                        
+                        <div class="rule-builder" id="rule-builder" style="display: none;">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Rule Builder</h3>
+                                    <button class="btn btn--sm btn--outline" id="close-builder">×</button>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">Rule Name</label>
+                                        <input type="text" class="form-control" id="rule-name" placeholder="Enter rule name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Condition</label>
+                                        <div class="condition-builder">
+                                            <select class="form-control" id="condition-field">
+                                                <option value="">Select field...</option>
+                                                <option value="client.priority">Client Priority</option>
+                                                <option value="worker.skill_level">Worker Skill Level</option>
+                                                <option value="task.status">Task Status</option>
+                                                <option value="task.due_date">Task Due Date</option>
+                                            </select>
+                                            <select class="form-control" id="condition-operator">
+                                                <option value="equals">equals</option>
+                                                <option value="not_equals">not equals</option>
+                                                <option value="contains">contains</option>
+                                                <option value="greater_than">greater than</option>
+                                                <option value="less_than">less than</option>
+                                            </select>
+                                            <input type="text" class="form-control" id="condition-value" placeholder="Value">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Action</label>
+                                        <select class="form-control" id="rule-action">
+                                            <option value="">Select action...</option>
+                                            <option value="assign_senior_worker">Assign Senior Worker</option>
+                                            <option value="send_alert">Send Alert</option>
+                                            <option value="flag_overallocation">Flag Over-allocation</option>
+                                            <option value="update_priority">Update Priority</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Priority</label>
+                                        <select class="form-control" id="rule-priority">
+                                            <option value="low">Low</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="high">High</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <input type="checkbox" id="rule-active" checked> Active
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button class="btn btn--primary" id="save-rule">Save Rule</button>
+                                        <button class="btn btn--secondary" id="test-rule">Test Rule</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Priorities Section -->
+                <section id="priorities-section" class="section">
+                    <div class="section-header">
+                        <h2>System Priorities</h2>
+                        <p>Configure how the system should balance different needs</p>
+                    </div>
+                    
+                    <div class="priorities-container">
+                        <div class="priority-settings">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h3>Data Quality vs Processing Speed</h3>
+                                    <p>Higher quality means more thorough validation but slower processing</p>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="range" id="quality-speed" min="0" max="100" value="75" class="priority-slider">
+                                    <div class="slider-labels">
+                                        <span>Speed</span>
+                                        <span>Quality</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h3>Validation Strictness</h3>
+                                    <p>Controls how strict the validation rules are applied</p>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="range" id="validation-strictness" min="0" max="100" value="60" class="priority-slider">
+                                    <div class="slider-labels">
+                                        <span>Lenient</span>
+                                        <span>Strict</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h3>Auto-correction Level</h3>
+                                    <p>How much automatic correction should be applied</p>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="range" id="auto-correction" min="0" max="100" value="40" class="priority-slider">
+                                    <div class="slider-labels">
+                                        <span>Manual</span>
+                                        <span>Auto</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h3>Conflict Resolution</h3>
+                                    <p>How conflicts in data should be resolved</p>
+                                </div>
+                                <div class="setting-control">
+                                    <select class="form-control" id="conflict-resolution">
+                                        <option value="ask_user">Ask User</option>
+                                        <option value="use_newest">Use Newest Data</option>
+                                        <option value="use_oldest">Use Oldest Data</option>
+                                        <option value="flag_for_review">Flag for Review</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="priority-preview">
+                            <h3>Current Configuration</h3>
+                            <div class="config-summary">
+                                <div class="config-item">
+                                    <span>Quality Focus: </span>
+                                    <strong id="quality-display">75%</strong>
+                                </div>
+                                <div class="config-item">
+                                    <span>Validation Strictness: </span>
+                                    <strong id="strictness-display">60%</strong>
+                                </div>
+                                <div class="config-item">
+                                    <span>Auto-correction: </span>
+                                    <strong id="correction-display">40%</strong>
+                                </div>
+                                <div class="config-item">
+                                    <span>Conflict Resolution: </span>
+                                    <strong id="resolution-display">Ask User</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Export Section -->
+                <section id="export-section" class="section">
+                    <div class="section-header">
+                        <h2>Export Data</h2>
+                        <p>Export your cleaned data and configuration files</p>
+                    </div>
+                    
+                    <div class="export-container">
+                        <div class="export-options">
+                            <div class="export-group">
+                                <h3>Data Export</h3>
+                                <div class="export-items">
+                                    <div class="export-item">
+                                        <div class="export-info">
+                                            <h4>Clients Data</h4>
+                                            <p>3 records ready for export</p>
+                                        </div>
+                                        <div class="export-actions">
+                                            <button class="btn btn--sm btn--outline" data-export="clients" data-format="csv">CSV</button>
+                                            <button class="btn btn--sm btn--outline" data-export="clients" data-format="xlsx">XLSX</button>
+                                            <button class="btn btn--sm btn--outline" data-export="clients" data-format="json">JSON</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="export-item">
+                                        <div class="export-info">
+                                            <h4>Workers Data</h4>
+                                            <p>3 records ready for export</p>
+                                        </div>
+                                        <div class="export-actions">
+                                            <button class="btn btn--sm btn--outline" data-export="workers" data-format="csv">CSV</button>
+                                            <button class="btn btn--sm btn--outline" data-export="workers" data-format="xlsx">XLSX</button>
+                                            <button class="btn btn--sm btn--outline" data-export="workers" data-format="json">JSON</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="export-item">
+                                        <div class="export-info">
+                                            <h4>Tasks Data</h4>
+                                            <p>3 records ready for export</p>
+                                        </div>
+                                        <div class="export-actions">
+                                            <button class="btn btn--sm btn--outline" data-export="tasks" data-format="csv">CSV</button>
+                                            <button class="btn btn--sm btn--outline" data-export="tasks" data-format="xlsx">XLSX</button>
+                                            <button class="btn btn--sm btn--outline" data-export="tasks" data-format="json">JSON</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="export-group">
+                                <h3>Configuration Export</h3>
+                                <div class="export-items">
+                                    <div class="export-item">
+                                        <div class="export-info">
+                                            <h4>Business Rules</h4>
+                                            <p>Export rules configuration as JSON</p>
+                                        </div>
+                                        <div class="export-actions">
+                                            <button class="btn btn--sm btn--primary" id="export-rules">Export rules.json</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="export-item">
+                                        <div class="export-info">
+                                            <h4>Validation Reports</h4>
+                                            <p>Export validation summary and results</p>
+                                        </div>
+                                        <div class="export-actions">
+                                            <button class="btn btn--sm btn--primary" id="export-validation">Export Report</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="export-group">
+                                <h3>Bulk Export</h3>
+                                <div class="bulk-export-actions">
+                                    <button class="btn btn--primary btn--lg" id="export-all">Export All Data & Config</button>
+                                    <p>Downloads a ZIP file with all data and configuration files</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
